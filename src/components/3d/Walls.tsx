@@ -76,7 +76,7 @@ export default function Walls() {
 
             {/* Add windows using the reusable Window component */}
             <Window
-                position={[-5, 2, 1]}
+                position={[-5, 2, -1]}
                 rotation={[0, Math.PI / 2, 0]}
                 size={[1.5, 1.2]}
             />
