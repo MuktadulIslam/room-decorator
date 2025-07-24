@@ -5,6 +5,7 @@ import { Suspense } from 'react'
 import Room from './3d/Room'
 import Lighting from './3d/Lighting'
 import CameraController from './3d/CameraController'
+import { OrbitControls } from '@react-three/drei'
 
 export default function Scene() {
     return (
@@ -18,7 +19,7 @@ export default function Scene() {
             shadows
             className="bg-gradient-to-b from-blue-200 to-blue-300"
         >
-
+            {/* <OrbitControls /> */}
             <Suspense fallback={null}>
                 <CameraController />
                 <Lighting />
