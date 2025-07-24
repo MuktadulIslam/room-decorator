@@ -3,9 +3,8 @@
 import { Canvas } from '@react-three/fiber'
 import { Suspense } from 'react'
 import Room from './3d/Room'
-import CameraController from './3d/CameraController'
 import Lighting from './3d/Lighting'
-import { OrbitControls } from '@react-three/drei'
+import CameraController from './3d/CameraController'
 
 export default function Scene() {
     return (

@@ -183,32 +183,6 @@ export default function Window({ position, rotation = [0, 0, 0], size }: WindowP
                 </mesh>
             </group>
 
-            {/* Window hardware - realistic handles */}
-            <group position={[width / 3, -height / 6, frameDepth / 2 + 0.02]}>
-                {/* Handle base */}
-                <mesh castShadow>
-                    <cylinderGeometry args={[0.015, 0.015, 0.06, 8]} />
-                    <meshLambertMaterial color="#b8860b" />
-                </mesh>
-
-                {/* Handle lever */}
-                <mesh position={[0.03, 0, 0.035]} rotation={[0, 0, Math.PI / 6]} castShadow>
-                    <boxGeometry args={[0.06, 0.01, 0.015]} />
-                    <meshLambertMaterial color="#daa520" />
-                </mesh>
-
-                {/* Handle end cap */}
-                <mesh position={[0.055, 0, 0.035]} castShadow>
-                    <sphereGeometry args={[0.008, 8, 6]} />
-                    <meshLambertMaterial color="#b8860b" />
-                </mesh>
-            </group>
-
-            {/* Window latch */}
-            <mesh position={[0, -height / 4, frameDepth / 2 + 0.015]} castShadow>
-                <boxGeometry args={[0.04, 0.02, 0.01]} />
-                <meshLambertMaterial color="#708090" />
-            </mesh>
 
             {/* Weatherstripping */}
             <group>
