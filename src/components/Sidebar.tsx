@@ -16,7 +16,7 @@ export default function Sidebar() {
     ]
 
     return (
-        <div className="w-80 bg-white shadow-lg border-r border-gray-200 p-6">
+        <div className="w-80 bg-white shadow-lg border-r border-gray-200 p-4">
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">
                     3D Room Viewer
@@ -41,7 +41,7 @@ export default function Sidebar() {
                                 type="color"
                                 value={wallColor}
                                 onChange={(e) => setWallColor(e.target.value)}
-                                className="w-12 h-12 rounded-lg border-2 border-gray-300 cursor-pointer"
+                                className="w-12 h-12 rounded-lg border-gray-300 cursor-pointer"
                             />
                             <div className="flex-1">
                                 <input
@@ -64,7 +64,7 @@ export default function Sidebar() {
                                 type="color"
                                 value={floorColor}
                                 onChange={(e) => setFloorColor(e.target.value)}
-                                className="w-12 h-12 rounded-lg border-2 border-gray-300 cursor-pointer"
+                                className="w-12 h-12 rounded-lg border-gray-300 cursor-pointer"
                             />
                             <div className="flex-1">
                                 <input

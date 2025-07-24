@@ -12,8 +12,8 @@ interface ColorContextType {
 const ColorContext = createContext<ColorContextType | undefined>(undefined)
 
 export function ColorProvider({ children }: { children: ReactNode }) {
-    const [wallColor, setWallColor] = useState('#f8f8f8')
-    const [floorColor, setFloorColor] = useState('#f8f8ff')
+    const [wallColor, setWallColor] = useState('#d6f1ff')
+    const [floorColor, setFloorColor] = useState('#d7d4cc')
 
     return (
         <ColorContext.Provider value={{
