@@ -32,6 +32,7 @@ interface ColorContextType {
     floorBorderWidth: number
     floorTexture: string | null
     floorTileTextures: Record<string, string | null>
+    floorRotation: number // New property for floor rotation
     tilesWidth: number
     tilesLength: number
     selectedWall: string | null
@@ -48,6 +49,7 @@ interface ColorContextType {
     setFloorBorderWidth: (width: number) => void
     setFloorTexture: (texture: string | null) => void
     setFloorTileTexture: (tileKey: string, texture: string | null) => void
+    setFloorRotation: (rotation: number) => void // New setter for floor rotation
     setTilesWidth: (width: number) => void
     setTilesLength: (length: number) => void
     setSelectedWall: (wallId: string | null) => void
@@ -87,6 +89,7 @@ export function ColorProvider({ children }: { children: ReactNode }) {
     const [floorBorderWidth, setFloorBorderWidth] = useState(0.05)
     const [floorTexture, setFloorTexture] = useState<string | null>(null)
     const [floorTileTextures, setFloorTileTextures] = useState<Record<string, string | null>>({})
+    const [floorRotation, setFloorRotation] = useState(0) // New state for floor rotation
     const [tilesWidth, setTilesWidth] = useState(12) // Default 12 inches
     const [tilesLength, setTilesLength] = useState(12) // Default 12 inches
     const [selectedWall, setSelectedWall] = useState<string | null>(null)
@@ -194,6 +197,7 @@ export function ColorProvider({ children }: { children: ReactNode }) {
             floorBorderWidth,
             floorTexture,
             floorTileTextures,
+            floorRotation, // Include new property
             tilesWidth,
             tilesLength,
             selectedWall,
@@ -210,6 +214,7 @@ export function ColorProvider({ children }: { children: ReactNode }) {
             setFloorBorderWidth,
             setFloorTexture,
             setFloorTileTexture,
+            setFloorRotation, // Include new setter
             setTilesLength,
             setTilesWidth,
             setSelectedWall,

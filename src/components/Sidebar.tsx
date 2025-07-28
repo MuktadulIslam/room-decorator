@@ -9,6 +9,7 @@ export default function Sidebar() {
         floorColor,
         floorBorderColor,
         floorBorderWidth,
+        floorRotation,
         tilesWidth,
         tilesLength,
         selectedWall,
@@ -18,6 +19,7 @@ export default function Sidebar() {
         setFloorColor,
         setFloorBorderColor,
         setFloorBorderWidth,
+        setFloorRotation,
         setTilesWidth,
         setTilesLength,
         setRoomWidth,
@@ -282,6 +284,23 @@ export default function Sidebar() {
                             className="text-base flex-1"
                             placeholder="#8b8680"
                         />
+                    </div>
+                </div>
+
+                <div className='flex gap-4 w-full h-auto items-center'>
+                    <label className="block flex-1 text-base font-bold text-gray-700">
+                        Floor Rotation (degrees)
+                    </label>
+                    <div className="w-36 py-0 flex items-center gap-4 border border-black rounded-md">
+                        <input
+                            type="range"
+                            min="-90"
+                            max="90"
+                            value={floorRotation}
+                            onChange={(e) => setFloorRotation(parseInt(e.target.value))}
+                            className="w-full"
+                        />
+                        <span className="text-sm font-medium w-8 text-center">{floorRotation}°</span>
                     </div>
                 </div>
 

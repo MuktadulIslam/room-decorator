@@ -78,19 +78,24 @@ function TiledFloor({ width, length, color, borderColor }: TiledFloorProps) {
   return <group position={[0, 0, 0]}>{tiles}</group>;
 }
 
-// Main Floor component that uses TiledFloor
+// Main Floor component that uses TiledFloor with rotation
 export default function Floor() {
-  const { floorColor, floorBorderColor, roomDimensions } = useColors();
+  const { floorColor, floorBorderColor, floorRotation, roomDimensions } = useColors();
 
   // Use room dimensions from context
   const { width: roomWidth, length: roomLength } = roomDimensions;
 
+  // Convert rotation from degrees to radians
+  const rotationInRadians = (floorRotation * Math.PI) / 180;
+
   return (
-    <TiledFloor
-      width={roomWidth * 3}
-      length={roomLength * 3}
-      color={floorColor}
-      borderColor={floorBorderColor}
-    />
+    <group rotation={[0, rotationInRadians, 0]}>
+      <TiledFloor
+        width={roomWidth * 3}
+        length={roomLength * 3}
+        color={floorColor}
+        borderColor={floorBorderColor}
+      />
+    </group>
   );
 }

@@ -6,7 +6,7 @@ export default function Bed() {
     const { scene } = useGLTF('./models/bed.glb')
     const clonedScene = useMemo(() => scene.clone(), [scene])
 
-    return <group>
+    return <group scale={1.7}>
         <primitive object={clonedScene} />
     </group>
 }
