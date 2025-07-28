@@ -4,6 +4,7 @@ export interface FloorTileProps {
   borderColor: string;
   texture?: string | null;
   tileKey: string;
+  tileSize?: [number, number];
 }
 
 export interface TiledFloorProps {

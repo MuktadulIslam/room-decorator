@@ -5,7 +5,7 @@ import { TiledFloorProps, FloorTileProps } from './types';
 import { useColors } from '../../contexts/ColorContext';
 
 // Floor tile component
-function FloorTile({ position, color, borderColor, texture, tileKey }: FloorTileProps) {
+function FloorTile({ position, color, borderColor, texture, tileKey, tileSize }: FloorTileProps) {
   const { setSelectedTile } = useColors();
 
   const handleClick = () => {
@@ -13,7 +13,9 @@ function FloorTile({ position, color, borderColor, texture, tileKey }: FloorTile
   };
 
   const borderWidth = 0.01; // Width of the border/grout lines
-  const tileSize = 1 - borderWidth;
+  const [tileSizeLength, tileSizeWidth] = tileSize || [1, 1];
+  const actualTileLength = tileSizeLength - borderWidth;
+  const actualTileWidth = tileSizeWidth - borderWidth;
 
   return (
     <group position={position}>
@@ -21,7 +23,7 @@ function FloorTile({ position, color, borderColor, texture, tileKey }: FloorTile
       <Plane
         rotation={[-Math.PI / 2, 0, 0]}
         position={[0, 0, 0]}
-        args={[1, 1]}
+        args={[tileSizeLength, tileSizeWidth]}
         onClick={handleClick}
       >
         <meshStandardMaterial color={borderColor} />
@@ -31,7 +33,7 @@ function FloorTile({ position, color, borderColor, texture, tileKey }: FloorTile
       <Plane
         rotation={[-Math.PI / 2, 0, 0]}
         position={[0, 0.001, 0]}
-        args={[tileSize, tileSize]}
+        args={[actualTileLength, actualTileWidth]}
         onClick={handleClick}
       >
         <meshStandardMaterial
@@ -45,13 +47,17 @@ function FloorTile({ position, color, borderColor, texture, tileKey }: FloorTile
 
 // Tiled floor component
 function TiledFloor({ width, length, color, borderColor }: TiledFloorProps) {
-  const { floorTexture } = useColors();
+  const { floorTexture, floorWidth: tileCountWidth, floorLength: tileCountLength } = useColors();
   const tiles: React.JSX.Element[] = [];
+  
+  // Calculate tile size based on room dimensions divided by tile count
+  const tileWidth = width / tileCountWidth;
+  const tileLength = length / tileCountLength;
 
-  for (let x = 0; x < length; x++) {
-    for (let z = 0; z < width; z++) {
-      const posX = x - length / 2 + 0.5;
-      const posZ = z - width / 2 + 0.5;
+  for (let x = 0; x < tileCountLength; x++) {
+    for (let z = 0; z < tileCountWidth; z++) {
+      const posX = (x - tileCountLength / 2 + 0.5) * tileLength;
+      const posZ = (z - tileCountWidth / 2 + 0.5) * tileWidth;
       const tileKey = `tile-${x}-${z}`;
 
       tiles.push(
@@ -62,6 +68,7 @@ function TiledFloor({ width, length, color, borderColor }: TiledFloorProps) {
           color={color}
           borderColor={borderColor}
           texture={floorTexture}
+          tileSize={[tileLength, tileWidth]}
         />
       );
     }
@@ -74,10 +81,14 @@ function TiledFloor({ width, length, color, borderColor }: TiledFloorProps) {
 export default function Floor() {
   const { floorColor, floorBorderColor, floorBorderWidth } = useColors();
 
+  // Fixed room dimensions - these represent the actual room size
+  const roomWidth = 8;  // Room width in units
+  const roomLength = 10; // Room length in units
+
   return (
     <TiledFloor
-      width={8}
-      length={10}
+      width={roomWidth}
+      length={roomLength}
       color={floorColor}
       borderColor={floorBorderColor}
     />

@@ -9,12 +9,16 @@ export default function Sidebar() {
         floorColor,
         floorBorderColor,
         floorBorderWidth,
+        floorWidth,
+        floorLength,
         selectedWall,
         dropdownSelectedWall,
         setWallColor,
         setFloorColor,
         setFloorBorderColor,
         setFloorBorderWidth,
+        setFloorWidth,
+        setFloorLength,
         applyColorToSelectedWall,
         applyColorToAllWalls,
         applyColorToDropdownSelectedWall,
@@ -54,13 +58,6 @@ export default function Sidebar() {
         reader.readAsDataURL(file)
     }
 
-    const tileOptions = [
-        { id: 'marble', name: 'Marble', color: '#f8f8ff' },
-        { id: 'wood', name: 'Wood', color: '#deb887' },
-        { id: 'ceramic', name: 'Ceramic', color: '#e6e6fa' },
-        { id: 'stone', name: 'Stone', color: '#d3d3d3' },
-    ]
-
     return (
         <div className="w-96 bg-white shadow-lg border-r border-gray-200 p-2 space-y-4">
             <h2 className="text-2xl font-bold text-gray-800 border-b-2 mb-4">
@@ -77,7 +74,7 @@ export default function Sidebar() {
                         id='room-wall-selection'
                         value={dropdownSelectedWall}
                         onChange={(e) => setDropdownSelectedWall(e.target.value)}
-                        className="w-48 px-3 py-1.5 border border-black rounded-md text-base"
+                        className="w-36 px-3 py-1.5 border border-black rounded-md text-base"
                     >
                         <option value="all">All Walls</option>
                         <option value="left">Left Wall</option>
@@ -91,7 +88,7 @@ export default function Sidebar() {
                     <label htmlFor='room-wall-color' className="block flex-1 text-base font-bold text-gray-700">
                         Wall Color
                     </label>
-                    <div className="w-48 py-0 flex items-center gap-4 border border-black rounded-md">
+                    <div className="w-36 py-0 flex items-center gap-4 border border-black rounded-md">
                         <input
                             type="color"
                             id='room-wall-color'
@@ -168,7 +165,7 @@ export default function Sidebar() {
                     <label className="block flex-1 text-base font-bold text-gray-700">
                         Floor Color
                     </label>
-                    <div className="w-48 py-0 flex items-center gap-4 border border-black rounded-md">
+                    <div className="w-36 py-0 flex items-center gap-4 border border-black rounded-md">
                         <input
                             type="color"
                             value={floorColor}
@@ -189,7 +186,7 @@ export default function Sidebar() {
                     <label className="block flex-1 text-base font-bold text-gray-700">
                         Floor Border Color
                     </label>
-                    <div className="w-48 py-0 flex items-center gap-4 border border-black rounded-md">
+                    <div className="w-36 py-0 flex items-center gap-4 border border-black rounded-md">
                         <input
                             type="color"
                             value={floorBorderColor}
@@ -202,6 +199,38 @@ export default function Sidebar() {
                             onChange={(e) => setFloorBorderColor(e.target.value)}
                             className="text-base flex-1"
                             placeholder="#8b8680"
+                        />
+                    </div>
+                </div>
+
+                <div className='flex gap-4 w-full h-auto items-center'>
+                    <label className="block flex-1 text-base font-bold text-gray-700">
+                        Tiles Count (Width)
+                    </label>
+                    <div className="w-36 py-0 flex items-center gap-4 border border-black rounded-md">
+                        <input
+                            type="number"
+                            min="3"
+                            max="20"
+                            value={floorWidth}
+                            onChange={(e) => setFloorWidth(Math.max(3, Math.min(20, parseInt(e.target.value) || 3)))}
+                            className="w-full px-3 py-1.5 text-base"
+                        />
+                    </div>
+                </div>
+
+                <div className='flex gap-4 w-full h-auto items-center'>
+                    <label className="block flex-1 text-base font-bold text-gray-700">
+                        Tiles Count (Length)
+                    </label>
+                    <div className="w-36 py-0 flex items-center gap-4 border border-black rounded-md">
+                        <input
+                            type="number"
+                            min="3"
+                            max="20"
+                            value={floorLength}
+                            onChange={(e) => setFloorLength(Math.max(3, Math.min(20, parseInt(e.target.value) || 3)))}
+                            className="w-full px-3 py-1.5 text-base"
                         />
                     </div>
                 </div>
