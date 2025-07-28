@@ -13,12 +13,17 @@ export default function Sidebar() {
         tilesLength,
         selectedWall,
         dropdownSelectedWall,
+        roomDimensions,
         setWallColor,
         setFloorColor,
         setFloorBorderColor,
         setFloorBorderWidth,
         setTilesWidth,
         setTilesLength,
+        setRoomWidth,
+        setRoomLength,
+        setRoomHeight,
+        setWallThickness,
         applyColorToSelectedWall,
         applyColorToAllWalls,
         applyColorToDropdownSelectedWall,
@@ -59,10 +64,87 @@ export default function Sidebar() {
     }
 
     return (
-        <div className="w-96 bg-white shadow-lg border-r border-gray-200 p-2 space-y-4">
+        <div className="w-96 bg-white shadow-lg border-r border-gray-200 p-2 space-y-4 overflow-y-auto max-h-screen">
             <h2 className="text-2xl font-bold text-gray-800 border-b-2 mb-4">
                 Room Settings
             </h2>
+
+            {/* Room Dimensions Section */}
+            {/* <div className="w-full h-auto p-2 bg-green-500/30 rounded-lg space-y-2">
+                <h2 className='text-xl font-bold mb-4'>Room Dimensions</h2>
+
+                <div className='flex gap-4 w-full h-auto items-center'>
+                    <label className="block flex-1 text-base font-bold text-gray-700">
+                        Room Width (units)
+                    </label>
+                    <div className="w-36 py-0 flex items-center gap-4 border border-black rounded-md">
+                        <input
+                            type="range"
+                            min="6"
+                            max="20"
+                            step="0.5"
+                            value={roomDimensions.width}
+                            onChange={(e) => setRoomWidth(parseFloat(e.target.value))}
+                            className="w-full"
+                        />
+                        <span className="text-sm font-medium w-12 text-center">{roomDimensions.width}</span>
+                    </div>
+                </div>
+
+                <div className='flex gap-4 w-full h-auto items-center'>
+                    <label className="block flex-1 text-base font-bold text-gray-700">
+                        Room Length (units)
+                    </label>
+                    <div className="w-36 py-0 flex items-center gap-4 border border-black rounded-md">
+                        <input
+                            type="range"
+                            min="6"
+                            max="20"
+                            step="0.5"
+                            value={roomDimensions.length}
+                            onChange={(e) => setRoomLength(parseFloat(e.target.value))}
+                            className="w-full"
+                        />
+                        <span className="text-sm font-medium w-12 text-center">{roomDimensions.length}</span>
+                    </div>
+                </div>
+
+                <div className='flex gap-4 w-full h-auto items-center'>
+                    <label className="block flex-1 text-base font-bold text-gray-700">
+                        Room Height (units)
+                    </label>
+                    <div className="w-36 py-0 flex items-center gap-4 border border-black rounded-md">
+                        <input
+                            type="range"
+                            min="2.5"
+                            max="5"
+                            step="0.1"
+                            value={roomDimensions.height}
+                            onChange={(e) => setRoomHeight(parseFloat(e.target.value))}
+                            className="w-full"
+                        />
+                        <span className="text-sm font-medium w-12 text-center">{roomDimensions.height}</span>
+                    </div>
+                </div>
+
+                <div className='flex gap-4 w-full h-auto items-center'>
+                    <label className="block flex-1 text-base font-bold text-gray-700">
+                        Wall Thickness
+                    </label>
+                    <div className="w-36 py-0 flex items-center gap-4 border border-black rounded-md">
+                        <input
+                            type="range"
+                            min="0.1"
+                            max="0.5"
+                            step="0.05"
+                            value={roomDimensions.wallThickness}
+                            onChange={(e) => setWallThickness(parseFloat(e.target.value))}
+                            className="w-full"
+                        />
+                        <span className="text-sm font-medium w-12 text-center">{roomDimensions.wallThickness}</span>
+                    </div>
+                </div>
+            </div> */}
 
             <div className="w-full h-auto p-2 bg-blue-500/30 rounded-lg space-y-2">
                 <h2 className='text-xl font-bold mb-4'>Wall Decoration</h2>
@@ -159,7 +241,7 @@ export default function Sidebar() {
             </div>
 
 
-            <div className="w-full h-auto p-2 bg-blue-500/30 rounded-lg space-y-2">
+            <div className="w-full h-auto p-2 bg-yellow-500/30 rounded-lg space-y-2">
                 <h2 className='text-xl font-bold mb-4'>Floor Decoration</h2>
                 <div className='flex gap-4 w-full h-auto items-center'>
                     <label className="block flex-1 text-base font-bold text-gray-700">

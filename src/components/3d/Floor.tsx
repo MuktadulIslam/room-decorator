@@ -80,11 +80,10 @@ function TiledFloor({ width, length, color, borderColor }: TiledFloorProps) {
 
 // Main Floor component that uses TiledFloor
 export default function Floor() {
-  const { floorColor, floorBorderColor, floorBorderWidth } = useColors();
+  const { floorColor, floorBorderColor, roomDimensions } = useColors();
 
-  // Fixed room dimensions - these represent the actual room size
-  const roomWidth = 8;  // Room width in units
-  const roomLength = 10; // Room length in units
+  // Use room dimensions from context
+  const { width: roomWidth, length: roomLength } = roomDimensions;
 
   return (
     <TiledFloor

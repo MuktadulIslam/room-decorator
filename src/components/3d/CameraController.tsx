@@ -3,9 +3,11 @@
 import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { useColors } from '../../contexts/ColorContext'
 
 export default function CameraController() {
     const { camera, gl } = useThree()
+    const { roomDimensions } = useColors()
     const keysPressed = useRef<Set<string>>(new Set())
     const isMouseDown = useRef(false)
     const mouseX = useRef(0)
@@ -18,6 +20,16 @@ export default function CameraController() {
 
     const yaw = useRef(0)
     const pitch = useRef(0)
+
+    // Calculate boundaries based on room dimensions
+    const { width: roomWidth, length: roomLength, wallThickness } = roomDimensions
+
+    // Calculate camera boundaries (keep camera inside room with some margin)
+    const margin = 0.5 // Keep camera away from walls
+    const maxX = roomWidth / 2 - wallThickness - margin
+    const minX = -roomWidth / 2 + wallThickness + margin
+    const maxZ = roomLength / 2 - wallThickness - margin
+    const minZ = -roomLength / 2 + wallThickness + margin
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -63,14 +75,14 @@ export default function CameraController() {
             const direction = new THREE.Vector3(0, 0, event.deltaY * 0.001)
             direction.applyQuaternion(camera.quaternion)
             direction.y = 0 // Keep movement only horizontal
-            
+
             const newPosition = camera.position.clone().add(direction)
-            
+
             // Keep camera within room bounds and maintain fixed Y position
-            newPosition.x = Math.max(-4.5, Math.min(4.5, newPosition.x))
-            newPosition.z = Math.max(-3.5, Math.min(3.5, newPosition.z))
+            newPosition.x = Math.max(minX, Math.min(maxX, newPosition.x))
+            newPosition.z = Math.max(minZ, Math.min(maxZ, newPosition.z))
             newPosition.y = camera.position.y // Keep Y position unchanged
-            
+
             camera.position.copy(newPosition)
         }
 
@@ -80,7 +92,7 @@ export default function CameraController() {
         window.addEventListener('mouseup', handleMouseUp)
         window.addEventListener('mousemove', handleMouseMove)
         gl.domElement.addEventListener('wheel', handleWheel, { passive: false })
-        
+
         gl.domElement.style.cursor = 'grab'
 
         return () => {
@@ -91,7 +103,7 @@ export default function CameraController() {
             window.removeEventListener('mousemove', handleMouseMove)
             gl.domElement.removeEventListener('wheel', handleWheel)
         }
-    }, [camera, gl])
+    }, [camera, gl, minX, maxX, minZ, maxZ])
 
     useFrame(() => {
         const keys = keysPressed.current
@@ -136,8 +148,8 @@ export default function CameraController() {
             camera.position.y = currentY
 
             // Boundary limits (keep within room)
-            camera.position.x = Math.max(-4.5, Math.min(4.5, camera.position.x))
-            camera.position.z = Math.max(-3.5, Math.min(3.5, camera.position.z))
+            camera.position.x = Math.max(minX, Math.min(maxX, camera.position.x))
+            camera.position.z = Math.max(minZ, Math.min(maxZ, camera.position.z))
         }
     })
 

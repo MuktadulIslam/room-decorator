@@ -19,7 +19,7 @@ export default function Scene() {
             shadows
             className="bg-gradient-to-b from-blue-200 to-blue-300"
         >
-            <OrbitControls maxZoom={1} minZoom={100} />
+            {/* <OrbitControls maxZoom={1} minZoom={100} /> */}
             <Suspense fallback={null}>
                 <CameraController />
                 <Lighting />

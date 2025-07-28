@@ -8,8 +8,19 @@ import Window from './Windows'
 import { useColors } from '../../contexts/ColorContext'
 
 export default function Walls() {
-    const { wallColors, wallTextures, selectedWall, setSelectedWall, setDropdownSelectedWall } = useColors()
+    const {
+        wallColors,
+        wallTextures,
+        selectedWall,
+        setSelectedWall,
+        setDropdownSelectedWall,
+        roomDimensions
+    } = useColors()
+
     const wallRefs = useRef<{ [key: string]: THREE.Mesh }>({})
+
+    // Extract room dimensions
+    const { width: roomWidth, length: roomLength, height: roomHeight, wallThickness } = roomDimensions
 
     const handleWallClick = (wallId: string) => (event: ThreeEvent<MouseEvent>) => {
         event.stopPropagation()
@@ -106,8 +117,6 @@ export default function Walls() {
         }
     }
 
-    const wallThickness = 0.2
-
     // Helper function to manually set UVs for the front face
     const setFrontFaceUVs = (geometry: THREE.ExtrudeGeometry) => {
         const pos = geometry.attributes.position;
@@ -195,66 +204,66 @@ export default function Walls() {
             {/* Back wall - 3D element */}
             <mesh
                 ref={(ref) => ref && (wallRefs.current['back'] = ref)}
-                position={[0, 1.5, -4]}
+                position={[0, roomHeight / 2, -roomLength / 2]}
                 receiveShadow
                 castShadow
                 onDoubleClick={handleWallClick('back')}
             >
-                <boxGeometry args={[10, 3, wallThickness]} />
+                <boxGeometry args={[roomWidth, roomHeight, wallThickness]} />
                 {createWallMaterial('back')}
             </mesh>
 
             {/* Left wall - 3D element */}
             <mesh
                 ref={(ref) => ref && (wallRefs.current['left'] = ref)}
-                position={[-5, 1.5, 0]}
+                position={[-roomWidth / 2, roomHeight / 2, 0]}
                 receiveShadow
                 castShadow
                 onDoubleClick={handleWallClick('left')}
             >
-                <boxGeometry args={[wallThickness, 3, 8]} />
+                <boxGeometry args={[wallThickness, roomHeight, roomLength]} />
                 {createWallMaterial('left')}
             </mesh>
 
             {/* Right wall - 3D element */}
             <mesh
                 ref={(ref) => ref && (wallRefs.current['right'] = ref)}
-                position={[5, 1.5, 0]}
+                position={[roomWidth / 2, roomHeight / 2, 0]}
                 receiveShadow
                 castShadow
                 onDoubleClick={handleWallClick('right')}
             >
-                <boxGeometry args={[wallThickness, 3, 8]} />
+                <boxGeometry args={[wallThickness, roomHeight, roomLength]} />
                 {createWallMaterial('right')}
             </mesh>
 
             {/* Front wall - 3D element */}
             <mesh
                 ref={(ref) => ref && (wallRefs.current['front'] = ref)}
-                position={[0, 1.5, 4]}
+                position={[0, roomHeight / 2, roomLength / 2]}
                 receiveShadow
                 castShadow
                 onDoubleClick={handleWallClick('front')}
             >
-                <boxGeometry args={[10, 3, wallThickness]} />
+                <boxGeometry args={[roomWidth, roomHeight, wallThickness]} />
                 {createWallMaterial('front')}
             </mesh>
 
             {/* Add windows using the reusable Window component */}
             <Window
-                position={[-5, 2, -1]}
+                position={[-roomWidth / 2, roomHeight * 0.67, -roomLength / 6]}
                 rotation={[0, Math.PI / 2, 0]}
                 size={[1.5, 1.2]}
             />
 
             <Window
-                position={[5, 2, -1]}
+                position={[roomWidth / 2, roomHeight * 0.67, -roomLength / 6]}
                 rotation={[0, -Math.PI / 2, 0]}
                 size={[1.5, 1.2]}
             />
 
             <Window
-                position={[2, 2, -4]}
+                position={[roomWidth / 5, roomHeight * 0.67, -roomLength / 2]}
                 rotation={[0, 0, 0]}
                 size={[2, 1.2]}
             />

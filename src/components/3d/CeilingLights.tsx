@@ -1,14 +1,23 @@
 'use client'
 
+import { useColors } from '../../contexts/ColorContext'
+
 export default function CeilingLights() {
-    // Light positions in 2x3 grid
+    const { roomDimensions } = useColors()
+    const { width: roomWidth, length: roomLength, height: roomHeight } = roomDimensions
+
+    // Calculate light positions based on room dimensions
+    // Create a 2x3 grid that scales with room size
+    const lightSpacingX = roomWidth / 3 // Divide width into 3 sections
+    const lightSpacingZ = roomLength / 4 // Divide length into 4 sections
+
     const lightPositions = [
-        [-2.5, 2.8, -1.5], // Row 1
-        [2.5, 2.8, -1.5],
-        [-2.5, 2.8, 0],    // Row 2  
-        [2.5, 2.8, 0],
-        [-2.5, 2.8, 1.5],  // Row 3
-        [2.5, 2.8, 1.5],
+        [-lightSpacingX / 2, roomHeight - 0.2, -lightSpacingZ], // Row 1
+        [lightSpacingX / 2, roomHeight - 0.2, -lightSpacingZ],
+        [-lightSpacingX / 2, roomHeight - 0.2, 0],    // Row 2  
+        [lightSpacingX / 2, roomHeight - 0.2, 0],
+        [-lightSpacingX / 2, roomHeight - 0.2, lightSpacingZ],  // Row 3
+        [lightSpacingX / 2, roomHeight - 0.2, lightSpacingZ],
     ]
 
     return (
@@ -25,7 +34,7 @@ export default function CeilingLights() {
                     <pointLight
                         position={[position[0], position[1] - 0.1, position[2]]}
                         intensity={0.4}
-                        distance={4}
+                        distance={Math.max(roomWidth, roomLength) * 0.8}
                         decay={2}
                         color="#ffffff"
                         castShadow
@@ -38,7 +47,7 @@ export default function CeilingLights() {
                         intensity={0.3}
                         angle={Math.PI / 4}
                         penumbra={0.5}
-                        distance={6}
+                        distance={roomHeight * 2}
                         decay={2}
                         color="#ffffff"
                         castShadow

@@ -16,6 +16,13 @@ interface WallTextures {
     front: string | null
 }
 
+interface RoomDimensions {
+    width: number    // Room width (left to right)
+    length: number   // Room length (front to back)
+    height: number   // Room height (floor to ceiling)
+    wallThickness: number // Wall thickness
+}
+
 interface ColorContextType {
     wallColor: string
     wallColors: WallColors
@@ -30,6 +37,7 @@ interface ColorContextType {
     selectedWall: string | null
     selectedTile: string | null
     dropdownSelectedWall: string
+    roomDimensions: RoomDimensions
     setWallColor: (color: string) => void
     setWallColors: (colors: WallColors | ((prev: WallColors) => WallColors)) => void
     setWallTextures: (textures: WallTextures | ((prev: WallTextures) => WallTextures)) => void
@@ -45,6 +53,11 @@ interface ColorContextType {
     setSelectedWall: (wallId: string | null) => void
     setSelectedTile: (tileKey: string | null) => void
     setDropdownSelectedWall: (wallId: string) => void
+    setRoomDimensions: (dimensions: RoomDimensions | ((prev: RoomDimensions) => RoomDimensions)) => void
+    setRoomWidth: (width: number) => void
+    setRoomLength: (length: number) => void
+    setRoomHeight: (height: number) => void
+    setWallThickness: (thickness: number) => void
     applyColorToSelectedWall: (color: string) => void
     applyColorToAllWalls: (color: string) => void
     applyColorToDropdownSelectedWall: (color: string) => void
@@ -80,6 +93,14 @@ export function ColorProvider({ children }: { children: ReactNode }) {
     const [selectedTile, setSelectedTile] = useState<string | null>(null)
     const [dropdownSelectedWall, setDropdownSelectedWall] = useState<string>('all')
 
+    // Room dimensions state
+    const [roomDimensions, setRoomDimensions] = useState<RoomDimensions>({
+        width: 15,      // Default 10 units wide
+        length: 12,      // Default 8 units long
+        height: 4,      // Default 3 units high
+        wallThickness: 0.2  // Default 0.2 units thick
+    })
+
     const setIndividualWallColor = (wallId: string, color: string) => {
         setWallColors(prev => ({
             ...prev,
@@ -99,6 +120,23 @@ export function ColorProvider({ children }: { children: ReactNode }) {
             ...prev,
             [tileKey]: texture
         }))
+    }
+
+    // Room dimension setters
+    const setRoomWidth = (width: number) => {
+        setRoomDimensions(prev => ({ ...prev, width }))
+    }
+
+    const setRoomLength = (length: number) => {
+        setRoomDimensions(prev => ({ ...prev, length }))
+    }
+
+    const setRoomHeight = (height: number) => {
+        setRoomDimensions(prev => ({ ...prev, height }))
+    }
+
+    const setWallThickness = (thickness: number) => {
+        setRoomDimensions(prev => ({ ...prev, wallThickness: thickness }))
     }
 
     const applyColorToSelectedWall = (color: string) => {
@@ -161,6 +199,7 @@ export function ColorProvider({ children }: { children: ReactNode }) {
             selectedWall,
             selectedTile,
             dropdownSelectedWall,
+            roomDimensions,
             setWallColor,
             setWallColors,
             setWallTextures,
@@ -176,6 +215,11 @@ export function ColorProvider({ children }: { children: ReactNode }) {
             setSelectedWall,
             setSelectedTile,
             setDropdownSelectedWall,
+            setRoomDimensions,
+            setRoomWidth,
+            setRoomLength,
+            setRoomHeight,
+            setWallThickness,
             applyColorToSelectedWall,
             applyColorToAllWalls,
             applyColorToDropdownSelectedWall,
