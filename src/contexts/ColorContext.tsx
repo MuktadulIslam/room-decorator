@@ -25,8 +25,8 @@ interface ColorContextType {
     floorBorderWidth: number
     floorTexture: string | null
     floorTileTextures: Record<string, string | null>
-    floorWidth: number
-    floorLength: number
+    tilesWidth: number
+    tilesLength: number
     selectedWall: string | null
     selectedTile: string | null
     dropdownSelectedWall: string
@@ -40,8 +40,8 @@ interface ColorContextType {
     setFloorBorderWidth: (width: number) => void
     setFloorTexture: (texture: string | null) => void
     setFloorTileTexture: (tileKey: string, texture: string | null) => void
-    setFloorWidth: (width: number) => void
-    setFloorLength: (length: number) => void
+    setTilesWidth: (width: number) => void
+    setTilesLength: (length: number) => void
     setSelectedWall: (wallId: string | null) => void
     setSelectedTile: (tileKey: string | null) => void
     setDropdownSelectedWall: (wallId: string) => void
@@ -74,8 +74,8 @@ export function ColorProvider({ children }: { children: ReactNode }) {
     const [floorBorderWidth, setFloorBorderWidth] = useState(0.05)
     const [floorTexture, setFloorTexture] = useState<string | null>(null)
     const [floorTileTextures, setFloorTileTextures] = useState<Record<string, string | null>>({})
-    const [floorWidth, setFloorWidth] = useState(8)
-    const [floorLength, setFloorLength] = useState(8)
+    const [tilesWidth, setTilesWidth] = useState(12) // Default 12 inches
+    const [tilesLength, setTilesLength] = useState(12) // Default 12 inches
     const [selectedWall, setSelectedWall] = useState<string | null>(null)
     const [selectedTile, setSelectedTile] = useState<string | null>(null)
     const [dropdownSelectedWall, setDropdownSelectedWall] = useState<string>('all')
@@ -156,8 +156,8 @@ export function ColorProvider({ children }: { children: ReactNode }) {
             floorBorderWidth,
             floorTexture,
             floorTileTextures,
-            floorWidth,
-            floorLength,
+            tilesWidth,
+            tilesLength,
             selectedWall,
             selectedTile,
             dropdownSelectedWall,
@@ -171,8 +171,8 @@ export function ColorProvider({ children }: { children: ReactNode }) {
             setFloorBorderWidth,
             setFloorTexture,
             setFloorTileTexture,
-            setFloorWidth,
-            setFloorLength,
+            setTilesLength,
+            setTilesWidth,
             setSelectedWall,
             setSelectedTile,
             setDropdownSelectedWall,

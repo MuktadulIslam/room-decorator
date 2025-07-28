@@ -9,16 +9,16 @@ export default function Sidebar() {
         floorColor,
         floorBorderColor,
         floorBorderWidth,
-        floorWidth,
-        floorLength,
+        tilesWidth,
+        tilesLength,
         selectedWall,
         dropdownSelectedWall,
         setWallColor,
         setFloorColor,
         setFloorBorderColor,
         setFloorBorderWidth,
-        setFloorWidth,
-        setFloorLength,
+        setTilesWidth,
+        setTilesLength,
         applyColorToSelectedWall,
         applyColorToAllWalls,
         applyColorToDropdownSelectedWall,
@@ -205,33 +205,35 @@ export default function Sidebar() {
 
                 <div className='flex gap-4 w-full h-auto items-center'>
                     <label className="block flex-1 text-base font-bold text-gray-700">
-                        Tiles Count (Width)
+                        Tiles Width (inches)
                     </label>
                     <div className="w-36 py-0 flex items-center gap-4 border border-black rounded-md">
                         <input
-                            type="number"
-                            min="3"
-                            max="20"
-                            value={floorWidth}
-                            onChange={(e) => setFloorWidth(Math.max(3, Math.min(20, parseInt(e.target.value) || 3)))}
-                            className="w-full px-3 py-1.5 text-base"
+                            type="range"
+                            min="10"
+                            max="50"
+                            value={tilesWidth}
+                            onChange={(e) => setTilesWidth(parseInt(e.target.value))}
+                            className="w-full"
                         />
+                        <span className="text-sm font-medium w-8 text-center">{tilesWidth}</span>
                     </div>
                 </div>
 
                 <div className='flex gap-4 w-full h-auto items-center'>
                     <label className="block flex-1 text-base font-bold text-gray-700">
-                        Tiles Count (Length)
+                        Tiles Length (inches)
                     </label>
                     <div className="w-36 py-0 flex items-center gap-4 border border-black rounded-md">
                         <input
-                            type="number"
-                            min="3"
-                            max="20"
-                            value={floorLength}
-                            onChange={(e) => setFloorLength(Math.max(3, Math.min(20, parseInt(e.target.value) || 3)))}
-                            className="w-full px-3 py-1.5 text-base"
+                            type="range"
+                            min="10"
+                            max="50"
+                            value={tilesLength}
+                            onChange={(e) => setTilesLength(parseInt(e.target.value))}
+                            className="w-full"
                         />
+                        <span className="text-sm font-medium w-8 text-center">{tilesLength}</span>
                     </div>
                 </div>
 

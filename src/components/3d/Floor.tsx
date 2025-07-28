@@ -47,17 +47,18 @@ function FloorTile({ position, color, borderColor, texture, tileKey, tileSize }:
 
 // Tiled floor component
 function TiledFloor({ width, length, color, borderColor }: TiledFloorProps) {
-  const { floorTexture, floorWidth: tileCountWidth, floorLength: tileCountLength } = useColors();
+  const { floorTexture, tilesWidth, tilesLength } = useColors();
   const tiles: React.JSX.Element[] = [];
-  
-  // Calculate tile size based on room dimensions divided by tile count
-  const tileWidth = width / tileCountWidth;
-  const tileLength = length / tileCountLength;
 
-  for (let x = 0; x < tileCountLength; x++) {
-    for (let z = 0; z < tileCountWidth; z++) {
-      const posX = (x - tileCountLength / 2 + 0.5) * tileLength;
-      const posZ = (z - tileCountWidth / 2 + 0.5) * tileWidth;
+  const tilesLenghtInFoot = tilesLength / 12;
+  const tilesWidthInFoot = tilesWidth / 12;
+  const tilesCountInLength = Math.round(length / tilesLenghtInFoot);
+  const tilesCountInWidth = Math.round(width / tilesWidthInFoot);
+
+  for (let x = 0; x < tilesCountInLength; x++) {
+    for (let z = 0; z < tilesCountInWidth; z++) {
+      const posX = (x - tilesCountInLength / 2 + 0.5) * tilesLenghtInFoot;
+      const posZ = (z - tilesCountInWidth / 2 + 0.5) * tilesWidthInFoot;
       const tileKey = `tile-${x}-${z}`;
 
       tiles.push(
@@ -68,7 +69,7 @@ function TiledFloor({ width, length, color, borderColor }: TiledFloorProps) {
           color={color}
           borderColor={borderColor}
           texture={floorTexture}
-          tileSize={[tileLength, tileWidth]}
+          tileSize={[tilesLenghtInFoot, tilesWidthInFoot]}
         />
       );
     }
@@ -87,8 +88,8 @@ export default function Floor() {
 
   return (
     <TiledFloor
-      width={roomWidth}
-      length={roomLength}
+      width={roomWidth * 3}
+      length={roomLength * 3}
       color={floorColor}
       borderColor={floorBorderColor}
     />
