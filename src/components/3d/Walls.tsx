@@ -9,12 +9,18 @@ import Window from './Windows'
 import { useColors } from '../../contexts/ColorContext'
 
 export default function Walls() {
-    const { wallColors, wallTextures, selectedWall, setSelectedWall } = useColors()
+    const { wallColors, wallTextures, selectedWall, setSelectedWall, setDropdownSelectedWall } = useColors()
     const wallRefs = useRef<{ [key: string]: THREE.Mesh }>({})
 
     const handleWallClick = (wallId: string) => (event: ThreeEvent<MouseEvent>) => {
         event.stopPropagation()
-        setSelectedWall(selectedWall === wallId ? null : wallId)
+        if (selectedWall === wallId) {
+            setSelectedWall(null)
+            setDropdownSelectedWall('all')
+        } else {
+            setSelectedWall(wallId)
+            setDropdownSelectedWall(wallId)
+        }
     }
 
     const getWallColor = (wallId: string) => {
@@ -22,7 +28,7 @@ export default function Walls() {
     }
 
     const getWallOpacity = (wallId: string) => {
-        return selectedWall === wallId ? 0.8 : 1.0
+        return 1.0
     }
 
     // Pre-load all wall textures using hooks
@@ -93,7 +99,7 @@ export default function Walls() {
                 <meshLambertMaterial
                     key={`${wallId}-textured-${wallTextures[wallId as keyof typeof wallTextures]}`}
                     map={textureMap}
-                    transparent={selectedWall === wallId}
+                    transparent={false}
                     opacity={opacity}
                 />
             )
@@ -102,7 +108,7 @@ export default function Walls() {
                 <meshLambertMaterial
                     key={`${wallId}-colored-${color}`}
                     color={color}
-                    transparent={selectedWall === wallId}
+                    transparent={false}
                     opacity={opacity}
                 />
             )

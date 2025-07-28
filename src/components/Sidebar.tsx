@@ -10,16 +10,19 @@ export default function Sidebar() {
         floorBorderColor,
         floorBorderWidth,
         selectedWall,
+        dropdownSelectedWall,
         setWallColor,
         setFloorColor,
         setFloorBorderColor,
         setFloorBorderWidth,
         applyColorToSelectedWall,
         applyColorToAllWalls,
+        applyColorToDropdownSelectedWall,
         applyTextureToSelectedWall,
         applyTextureToAllWalls,
         setFloorTexture,
-        setSelectedWall
+        setSelectedWall,
+        setDropdownSelectedWall
     } = useColors()
     const [selectedTile, setSelectedTile] = useState('marble')
     const [ceilingLightsOn, setCeilingLightsOn] = useState(true)
@@ -34,12 +37,12 @@ export default function Sidebar() {
             console.log('Data URL preview:', imageUrl.substring(0, 100) + '...')
 
             if (target === 'wall') {
-                if (selectedWall) {
-                    console.log('Applying texture to selected wall:', selectedWall)
-                    applyTextureToSelectedWall(imageUrl)
-                } else {
+                if (dropdownSelectedWall === 'all') {
                     console.log('Applying texture to all walls')
                     applyTextureToAllWalls(imageUrl)
+                } else {
+                    console.log('Applying texture to selected wall:', dropdownSelectedWall)
+                    applyTextureToSelectedWall(imageUrl)
                 }
             } else {
                 console.log('Applying texture to floor')
@@ -60,89 +63,70 @@ export default function Sidebar() {
     ]
 
     return (
-        <div className="w-80 bg-white shadow-lg border-r border-gray-200 p-4">
-            <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                    3D Room Viewer
-                </h1>
-                <p className="text-gray-600 text-sm">
-                    Navigate the room using keyboard controls.<br />
-                    Click on walls to select them for individual coloring.
-                </p>
-            </div>
+        <div className="w-96 bg-white shadow-lg border-r border-gray-200 p-2 space-y-4">
+            <h2 className="text-2xl font-bold text-gray-800 border-b-2 mb-4">
+                Room Settings
+            </h2>
 
-            <div className="mb-8">
-                <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                    Room Settings
-                </h2>
+            <div className="w-full h-auto p-2 bg-blue-500/30 rounded-lg space-y-2">
+                <h2 className='text-xl font-bold mb-4'>Wall Decoration</h2>
+                <div className='flex gap-4 w-full h-auto items-center'>
+                    <label htmlFor='room-wall-selection' className="block flex-1 text-base font-bold text-gray-700">
+                        Wall Selection
+                    </label>
+                    <select
+                        id='room-wall-selection'
+                        value={dropdownSelectedWall}
+                        onChange={(e) => setDropdownSelectedWall(e.target.value)}
+                        className="w-48 px-3 py-1.5 border border-black rounded-md text-base"
+                    >
+                        <option value="all">All Walls</option>
+                        <option value="left">Left Wall</option>
+                        <option value="right">Right Wall</option>
+                        <option value="front">Front Wall</option>
+                        <option value="back">Back Wall</option>
+                    </select>
+                </div>
 
-                <div className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Wall Color
-                        </label>
-                        <div className="flex items-center space-x-3">
-                            <input
-                                type="color"
-                                value={currentColor}
-                                onChange={(e) => setCurrentColor(e.target.value)}
-                                className="w-12 h-12 rounded-lg border-gray-300 cursor-pointer"
-                            />
-                            <div className="flex-1">
-                                <input
-                                    type="text"
-                                    value={currentColor}
-                                    onChange={(e) => setCurrentColor(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                                    placeholder="#ffffff"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="mt-4 space-y-2">
-                            {selectedWall && (
-                                <div className="p-2 bg-blue-50 border border-blue-200 rounded-md">
-                                    <p className="text-sm text-blue-800">
-                                        Selected: {selectedWall.charAt(0).toUpperCase() + selectedWall.slice(1)} Wall
-                                    </p>
-                                </div>
-                            )}
-
-                            <div className="flex space-x-2">
-                                <button
-                                    onClick={() => selectedWall ? applyColorToSelectedWall(currentColor) : null}
-                                    disabled={!selectedWall}
-                                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-md ${selectedWall
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                        }`}
-                                >
-                                    Apply to Selected
-                                </button>
-                                <button
-                                    onClick={() => applyColorToAllWalls(currentColor)}
-                                    className="flex-1 px-3 py-2 text-sm font-medium bg-green-600 text-white rounded-md hover:bg-green-700"
-                                >
-                                    Apply to All
-                                </button>
-                            </div>
-
-                            {selectedWall && (
-                                <button
-                                    onClick={() => setSelectedWall(null)}
-                                    className="w-full px-3 py-2 text-sm font-medium bg-gray-600 text-white rounded-md hover:bg-gray-700"
-                                >
-                                    Deselect Wall
-                                </button>
-                            )}
-                        </div>
+                <div className='flex gap-4 w-full h-auto items-center'>
+                    <label htmlFor='room-wall-color' className="block flex-1 text-base font-bold text-gray-700">
+                        Wall Color
+                    </label>
+                    <div className="w-48 py-0 flex items-center gap-4 border border-black rounded-md">
+                        <input
+                            type="color"
+                            id='room-wall-color'
+                            value={currentColor}
+                            onChange={(e) => {
+                                const newColor = e.target.value
+                                setCurrentColor(newColor)
+                                applyColorToDropdownSelectedWall(newColor)
+                            }}
+                            className="h-8 w-8 shrink-0 rounded-lg border-gray-300 cursor-pointer"
+                        />
+                        <input
+                            type="text"
+                            value={currentColor}
+                            onChange={(e) => {
+                                const newColor = e.target.value
+                                setCurrentColor(newColor)
+                                if (newColor.match(/^#[0-9A-F]{6}$/i)) {
+                                    applyColorToDropdownSelectedWall(newColor)
+                                }
+                            }}
+                            className="text-base flex-1"
+                            placeholder="#539fc6"
+                        />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Wall Texture
-                        </label>
-                        <div className="space-y-2">
+                </div>
+
+                <div className='w-full h-auto flex gap-2 items-center'>
+                    <label className="w-40 block text-base font-bold text-gray-700 mb-2">
+                        Wall Texture
+                    </label>
+                    <div className="flex gap-2 w-full h-auto">
+                        <div className='flex-1'>
                             <input
                                 type="file"
                                 accept="image/*"
@@ -153,107 +137,82 @@ export default function Sidebar() {
                                 className="hidden"
                                 id="wall-texture-upload"
                             />
-                            <div className="flex space-x-2">
-                                <label
-                                    htmlFor="wall-texture-upload"
-                                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-md cursor-pointer text-center ${selectedWall
-                                            ? 'bg-purple-600 text-white hover:bg-purple-700'
-                                            : 'bg-gray-300 text-gray-500'
-                                        }`}
-                                >
-                                    {selectedWall ? 'Texture Selected' : 'Select Texture for Selected'}
-                                </label>
-                                <label
-                                    htmlFor="wall-texture-upload"
-                                    className="flex-1 px-3 py-2 text-sm font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer text-center"
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        const input = document.createElement('input')
-                                        input.type = 'file'
-                                        input.accept = 'image/*'
-                                        input.onchange = (event) => {
-                                            const file = (event.target as HTMLInputElement).files?.[0]
-                                            if (file) {
-                                                const reader = new FileReader()
-                                                reader.onload = (e) => {
-                                                    const imageUrl = e.target?.result as string
-                                                    applyTextureToAllWalls(imageUrl)
-                                                }
-                                                reader.readAsDataURL(file)
-                                            }
-                                        }
-                                        input.click()
-                                    }}
-                                >
-                                    Texture All Walls
-                                </label>
-                            </div>
+                            <label
+                                htmlFor="wall-texture-upload"
+                                className="w-full px-1 py-2 text-sm font-medium bg-purple-600 text-white rounded-md hover:bg-purple-700 cursor-pointer block text-center"
+                            >
+                                Add Texture
+                            </label>
+                        </div>
+                        <div className='flex-1'>
                             <button
                                 onClick={() => {
-                                    if (selectedWall) {
-                                        applyTextureToSelectedWall(null)
-                                    } else {
+                                    if (dropdownSelectedWall === 'all') {
                                         applyTextureToAllWalls(null)
+                                    } else {
+                                        applyTextureToSelectedWall(null)
                                     }
                                 }}
-                                className="w-full px-3 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700"
+                                className="w-full px-1 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700"
                             >
-                                Remove Wall Textures
+                                Remove Texture
                             </button>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Floor Color
-                        </label>
-                        <div className="flex items-center space-x-3">
-                            <input
-                                type="color"
-                                value={floorColor}
-                                onChange={(e) => setFloorColor(e.target.value)}
-                                className="w-12 h-12 rounded-lg border-gray-300 cursor-pointer"
-                            />
-                            <div className="flex-1">
-                                <input
-                                    type="text"
-                                    value={floorColor}
-                                    onChange={(e) => setFloorColor(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                                    placeholder="#ffffff"
-                                />
-                            </div>
-                        </div>
+
+            <div className="w-full h-auto p-2 bg-blue-500/30 rounded-lg space-y-2">
+                <h2 className='text-xl font-bold mb-4'>Floor Decoration</h2>
+                <div className='flex gap-4 w-full h-auto items-center'>
+                    <label className="block flex-1 text-base font-bold text-gray-700">
+                        Floor Color
+                    </label>
+                    <div className="w-48 py-0 flex items-center gap-4 border border-black rounded-md">
+                        <input
+                            type="color"
+                            value={floorColor}
+                            onChange={(e) => setFloorColor(e.target.value)}
+                            className="w-8 h-8 shrink-0 rounded-lg border-gray-300 cursor-pointer"
+                        />
+                        <input
+                            type="text"
+                            value={floorColor}
+                            onChange={(e) => setFloorColor(e.target.value)}
+                            className="text-base flex-1"
+                            placeholder="#ffffff"
+                        />
                     </div>
+                </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Floor Border Color
-                        </label>
-                        <div className="flex items-center space-x-3">
-                            <input
-                                type="color"
-                                value={floorBorderColor}
-                                onChange={(e) => setFloorBorderColor(e.target.value)}
-                                className="w-12 h-12 rounded-lg border-gray-300 cursor-pointer"
-                            />
-                            <div className="flex-1">
-                                <input
-                                    type="text"
-                                    value={floorBorderColor}
-                                    onChange={(e) => setFloorBorderColor(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                                    placeholder="#8b8680"
-                                />
-                            </div>
-                        </div>
+                <div className='flex gap-4 w-full h-auto items-center'>
+                    <label className="block flex-1 text-base font-bold text-gray-700">
+                        Floor Border Color
+                    </label>
+                    <div className="w-48 py-0 flex items-center gap-4 border border-black rounded-md">
+                        <input
+                            type="color"
+                            value={floorBorderColor}
+                            onChange={(e) => setFloorBorderColor(e.target.value)}
+                            className="w-8 h-8 shrink-0 rounded-lg border-gray-300 cursor-pointer"
+                        />
+                        <input
+                            type="text"
+                            value={floorBorderColor}
+                            onChange={(e) => setFloorBorderColor(e.target.value)}
+                            className="text-base flex-1"
+                            placeholder="#8b8680"
+                        />
                     </div>
+                </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Floor Texture
-                        </label>
-                        <div className="space-y-2">
+                <div className='w-full h-auto flex gap-2 items-center'>
+                    <label className="w-40 block text-base font-bold text-gray-700 mb-2">
+                        Floor Texture
+                    </label>
+                    <div className="flex gap-2 w-full h-auto">
+                        <div className='flex-1'>
                             <input
                                 type="file"
                                 accept="image/*"
@@ -266,15 +225,17 @@ export default function Sidebar() {
                             />
                             <label
                                 htmlFor="floor-texture-upload"
-                                className="w-full px-3 py-2 text-sm font-medium bg-teal-600 text-white rounded-md hover:bg-teal-700 cursor-pointer block text-center"
+                                className="w-full px-1 py-2 text-sm font-medium bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer block text-center"
                             >
-                                Upload Floor Texture
+                                Add Texture
                             </label>
+                        </div>
+                        <div className='flex-1'>
                             <button
                                 onClick={() => setFloorTexture(null)}
-                                className="w-full px-3 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700"
+                                className="w-full px-1 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700"
                             >
-                                Remove Floor Texture
+                                Remove Texture
                             </button>
                         </div>
                     </div>

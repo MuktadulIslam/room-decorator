@@ -27,9 +27,10 @@ interface ColorContextType {
     floorTileTextures: Record<string, string | null>
     selectedWall: string | null
     selectedTile: string | null
+    dropdownSelectedWall: string
     setWallColor: (color: string) => void
-    setWallColors: (colors: Partial<WallColors>) => void
-    setWallTextures: (textures: Partial<WallTextures>) => void
+    setWallColors: (colors: WallColors | ((prev: WallColors) => WallColors)) => void
+    setWallTextures: (textures: WallTextures | ((prev: WallTextures) => WallTextures)) => void
     setIndividualWallColor: (wallId: string, color: string) => void
     setIndividualWallTexture: (wallId: string, texture: string | null) => void
     setFloorColor: (color: string) => void
@@ -39,8 +40,10 @@ interface ColorContextType {
     setFloorTileTexture: (tileKey: string, texture: string | null) => void
     setSelectedWall: (wallId: string | null) => void
     setSelectedTile: (tileKey: string | null) => void
+    setDropdownSelectedWall: (wallId: string) => void
     applyColorToSelectedWall: (color: string) => void
     applyColorToAllWalls: (color: string) => void
+    applyColorToDropdownSelectedWall: (color: string) => void
     applyTextureToSelectedWall: (texture: string | null) => void
     applyTextureToAllWalls: (texture: string | null) => void
     applyTextureToSelectedTile: (texture: string | null) => void
@@ -49,12 +52,12 @@ interface ColorContextType {
 const ColorContext = createContext<ColorContextType | undefined>(undefined)
 
 export function ColorProvider({ children }: { children: ReactNode }) {
-    const [wallColor, setWallColor] = useState('#d6f1ff')
+    const [wallColor, setWallColor] = useState('#539fc6')
     const [wallColors, setWallColors] = useState<WallColors>({
-        back: '#d6f1ff',
-        left: '#d6f1ff',
-        right: '#d6f1ff',
-        front: '#d6f1ff'
+        back: '#539fc6',
+        left: '#539fc6',
+        right: '#539fc6',
+        front: '#539fc6'
     })
     const [wallTextures, setWallTextures] = useState<WallTextures>({
         back: null,
@@ -69,6 +72,7 @@ export function ColorProvider({ children }: { children: ReactNode }) {
     const [floorTileTextures, setFloorTileTextures] = useState<Record<string, string | null>>({})
     const [selectedWall, setSelectedWall] = useState<string | null>(null)
     const [selectedTile, setSelectedTile] = useState<string | null>(null)
+    const [dropdownSelectedWall, setDropdownSelectedWall] = useState<string>('all')
 
     const setIndividualWallColor = (wallId: string, color: string) => {
         setWallColors(prev => ({
@@ -108,8 +112,8 @@ export function ColorProvider({ children }: { children: ReactNode }) {
     }
 
     const applyTextureToSelectedWall = (texture: string | null) => {
-        if (selectedWall) {
-            setIndividualWallTexture(selectedWall, texture)
+        if (dropdownSelectedWall && dropdownSelectedWall !== 'all') {
+            setIndividualWallTexture(dropdownSelectedWall, texture)
         }
     }
 
@@ -128,6 +132,14 @@ export function ColorProvider({ children }: { children: ReactNode }) {
         }
     }
 
+    const applyColorToDropdownSelectedWall = (color: string) => {
+        if (dropdownSelectedWall === 'all') {
+            applyColorToAllWalls(color)
+        } else {
+            setIndividualWallColor(dropdownSelectedWall, color)
+        }
+    }
+
     return (
         <ColorContext.Provider value={{
             wallColor,
@@ -140,6 +152,7 @@ export function ColorProvider({ children }: { children: ReactNode }) {
             floorTileTextures,
             selectedWall,
             selectedTile,
+            dropdownSelectedWall,
             setWallColor,
             setWallColors,
             setWallTextures,
@@ -152,8 +165,10 @@ export function ColorProvider({ children }: { children: ReactNode }) {
             setFloorTileTexture,
             setSelectedWall,
             setSelectedTile,
+            setDropdownSelectedWall,
             applyColorToSelectedWall,
             applyColorToAllWalls,
+            applyColorToDropdownSelectedWall,
             applyTextureToSelectedWall,
             applyTextureToAllWalls,
             applyTextureToSelectedTile
