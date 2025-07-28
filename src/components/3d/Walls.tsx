@@ -2,7 +2,6 @@
 
 import * as THREE from 'three'
 import { useRef, useMemo } from 'react'
-import { useLoader } from '@react-three/fiber'
 import { ThreeEvent } from '@react-three/fiber'
 import Ceiling from './Ceiling'
 import Window from './Windows'
@@ -42,7 +41,6 @@ export default function Walls() {
                     const tex = loader.load(textureUrl,
                         // onLoad callback
                         (texture) => {
-                            console.log(`Texture loaded for ${wallId}:`, textureUrl)
                             // Single image covers entire wall - no repetition
                             tex.wrapS = THREE.ClampToEdgeWrapping
                             tex.wrapT = THREE.ClampToEdgeWrapping
@@ -86,13 +84,6 @@ export default function Walls() {
         const textureMap = wallTextureMap[wallId]
         const color = getWallColor(wallId)
         const opacity = getWallOpacity(wallId)
-
-        console.log(`Creating material for ${wallId}:`, {
-            hasTexture: !!textureMap,
-            color,
-            opacity,
-            textureUrl: wallTextures[wallId as keyof typeof wallTextures]
-        })
 
         if (textureMap) {
             return (
