@@ -45,7 +45,7 @@ function FloorTile({ position, color, borderColor, texture, tileKey }: FloorTile
 
 // Tiled floor component
 function TiledFloor({ width, length, color, borderColor }: TiledFloorProps) {
-  const { floorTileTextures } = useColors();
+  const { floorTexture } = useColors();
   const tiles: React.JSX.Element[] = [];
 
   for (let x = 0; x < length; x++) {
@@ -61,7 +61,7 @@ function TiledFloor({ width, length, color, borderColor }: TiledFloorProps) {
           position={[posX, 0.01, posZ]}
           color={color}
           borderColor={borderColor}
-          texture={floorTileTextures[tileKey] || null}
+          texture={floorTexture}
         />
       );
     }

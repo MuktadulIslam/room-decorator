@@ -24,7 +24,6 @@ export default function Sidebar() {
         setSelectedWall,
         setDropdownSelectedWall
     } = useColors()
-    const [selectedTile, setSelectedTile] = useState('marble')
     const [ceilingLightsOn, setCeilingLightsOn] = useState(true)
     const [currentColor, setCurrentColor] = useState('#d6f1ff')
 
