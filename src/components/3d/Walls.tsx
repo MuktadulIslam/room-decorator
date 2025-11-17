@@ -1,8 +1,9 @@
 'use client'
 
 import * as THREE from 'three'
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useEffect, JSX } from 'react'
 import { ThreeEvent } from '@react-three/fiber'
+import { useTexture } from '@react-three/drei'
 import Ceiling from './Ceiling'
 import Window from './Windows'
 import { useColors } from '../../contexts/ColorContext'
@@ -22,6 +23,55 @@ export default function Walls() {
     // Extract room dimensions
     const { width: roomWidth, length: roomLength, height: roomHeight, wallThickness } = roomDimensions
 
+    // Optimize texture loading with useTexture hook and memoization
+    const textureUrls = useMemo(() => {
+        const urls: { [key: string]: string } = {}
+        Object.keys(wallTextures).forEach(wallId => {
+            const textureUrl = wallTextures[wallId as keyof typeof wallTextures]
+            if (textureUrl) {
+                urls[wallId] = textureUrl
+            }
+        })
+        return urls
+    }, [wallTextures])
+
+    // Load textures only when URLs change
+    const loadedTextures = useMemo(() => {
+        const textures: { [key: string]: THREE.Texture | null } = {}
+        
+        Object.keys(textureUrls).forEach(wallId => {
+            try {
+                const loader = new THREE.TextureLoader()
+                const texture = loader.load(textureUrls[wallId])
+                texture.wrapS = THREE.ClampToEdgeWrapping
+                texture.wrapT = THREE.ClampToEdgeWrapping
+                texture.repeat.set(1, 1)
+                texture.offset.set(0, 0)
+                texture.flipY = false
+                texture.generateMipmaps = false
+                texture.minFilter = THREE.LinearFilter
+                texture.magFilter = THREE.LinearFilter
+                textures[wallId] = texture
+            } catch (error) {
+                console.error(`Error loading texture for ${wallId}:`, error)
+                textures[wallId] = null
+            }
+        })
+        
+        return textures
+    }, [textureUrls])
+
+    // Dispose old textures when they change
+    useEffect(() => {
+        return () => {
+            Object.values(loadedTextures).forEach(texture => {
+                if (texture) {
+                    texture.dispose()
+                }
+            })
+        }
+    }, [loadedTextures])
+
     const handleWallClick = (wallId: string) => (event: ThreeEvent<MouseEvent>) => {
         event.stopPropagation()
         if (selectedWall === wallId) {
@@ -37,219 +87,97 @@ export default function Walls() {
         return wallColors[wallId as keyof typeof wallColors] || wallColors.back
     }
 
-    const getWallOpacity = (wallId: string) => {
-        return 1.0
-    }
-
-    // Pre-load all wall textures using hooks
-    const wallTextureMap = useMemo(() => {
-        const textures: { [key: string]: THREE.Texture | null } = {}
-        Object.keys(wallTextures).forEach(wallId => {
-            const textureUrl = wallTextures[wallId as keyof typeof wallTextures]
-            if (textureUrl) {
-                try {
-                    const loader = new THREE.TextureLoader()
-                    const tex = loader.load(textureUrl,
-                        // onLoad callback
-                        (texture) => {
-                            // Single image covers entire wall - no repetition
-                            tex.wrapS = THREE.ClampToEdgeWrapping
-                            tex.wrapT = THREE.ClampToEdgeWrapping
-                            tex.repeat.set(1, 1)
-                            tex.offset.set(0, 0)
-                            tex.flipY = true
-                            tex.generateMipmaps = false
-                            tex.minFilter = THREE.LinearFilter
-                            tex.magFilter = THREE.LinearFilter
-                            tex.needsUpdate = true
-                        },
-                        // onProgress callback
-                        undefined,
-                        // onError callback
-                        (error) => {
-                            console.error(`Failed to load texture for ${wallId}:`, error)
-                        }
-                    )
-                    // Initial settings (will be overridden in onLoad)
-                    tex.wrapS = THREE.ClampToEdgeWrapping
-                    tex.wrapT = THREE.ClampToEdgeWrapping
-                    tex.repeat.set(1, 1)
-                    tex.offset.set(0, 0)
-                    tex.flipY = false
-                    tex.generateMipmaps = false
-                    tex.minFilter = THREE.LinearFilter
-                    tex.magFilter = THREE.LinearFilter
-                    textures[wallId] = tex
-                } catch (error) {
-                    console.error(`Error creating texture for ${wallId}:`, error)
-                    textures[wallId] = null
-                }
+    // Memoize materials to prevent recreation
+    const wallMaterials = useMemo(() => {
+        const materials: { [key: string]: JSX.Element } = {}
+        
+        Object.keys(wallColors).forEach(wallId => {
+            const texture = loadedTextures[wallId]
+            const color = getWallColor(wallId)
+            
+            if (texture) {
+                materials[wallId] = (
+                    <meshLambertMaterial
+                        key={`${wallId}-textured`}
+                        map={texture}
+                        transparent={false}
+                    />
+                )
             } else {
-                textures[wallId] = null
+                materials[wallId] = (
+                    <meshLambertMaterial
+                        key={`${wallId}-colored`}
+                        color={color}
+                        transparent={false}
+                    />
+                )
             }
         })
-        return textures
-    }, [wallTextures])
+        
+        return materials
+    }, [wallColors, loadedTextures])
 
-    const createWallMaterial = (wallId: string) => {
-        const textureMap = wallTextureMap[wallId]
-        const color = getWallColor(wallId)
-        const opacity = getWallOpacity(wallId)
-
-        if (textureMap) {
-            return (
-                <meshLambertMaterial
-                    key={`${wallId}-textured-${wallTextures[wallId as keyof typeof wallTextures]}`}
-                    map={textureMap}
-                    transparent={false}
-                    opacity={opacity}
-                />
-            )
-        } else {
-            return (
-                <meshLambertMaterial
-                    key={`${wallId}-colored-${color}`}
-                    color={color}
-                    transparent={false}
-                    opacity={opacity}
-                />
-            )
-        }
-    }
-
-    // Helper function to manually set UVs for the front face
-    const setFrontFaceUVs = (geometry: THREE.ExtrudeGeometry) => {
-        const pos = geometry.attributes.position;
-        const uvs = [];
-
-        // Get bounding box to normalize UVs
-        geometry.computeBoundingBox();
-        const bbox = geometry.boundingBox!;
-        const width = bbox.max.x - bbox.min.x;
-        const height = bbox.max.y - bbox.min.y;
-
-        // For extruded geometry, we need to identify front face vertices
-        // Front face vertices have the maximum z value
-        const maxZ = bbox.max.z;
-
-        for (let i = 0; i < pos.count; i++) {
-            const x = pos.getX(i);
-            const y = pos.getY(i);
-            const z = pos.getZ(i);
-
-            // Only set proper UVs for front face vertices
-            if (Math.abs(z - maxZ) < 0.001) {
-                // Normalize to 0-1 range
-                const u = (x - bbox.min.x) / width;
-                const v = (y - bbox.min.y) / height;
-                uvs.push(u, v);
-            } else {
-                // Keep default UVs for other faces
-                uvs.push(0, 0);
-            }
-        }
-
-        geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-        return geometry;
-    }
-
-    // Create wall geometry with window openings
-    const createWallWithOpenings = (wallWidth: number, wallHeight: number, openings: Array<{ x: number, y: number, width: number, height: number }>) => {
-        const wallShape = new THREE.Shape()
-        wallShape.moveTo(-wallWidth / 2, -wallHeight / 2)
-        wallShape.lineTo(wallWidth / 2, -wallHeight / 2)
-        wallShape.lineTo(wallWidth / 2, wallHeight / 2)
-        wallShape.lineTo(-wallWidth / 2, wallHeight / 2)
-        wallShape.lineTo(-wallWidth / 2, -wallHeight / 2)
-
-        // Create holes for windows
-        openings.forEach(opening => {
-            const hole = new THREE.Path()
-            hole.moveTo(opening.x - opening.width / 2, opening.y - opening.height / 2)
-            hole.lineTo(opening.x + opening.width / 2, opening.y - opening.height / 2)
-            hole.lineTo(opening.x + opening.width / 2, opening.y + opening.height / 2)
-            hole.lineTo(opening.x - opening.width / 2, opening.y + opening.height / 2)
-            hole.lineTo(opening.x - opening.width / 2, opening.y - opening.height / 2)
-            wallShape.holes.push(hole)
-        })
-
-        const geometry = new THREE.ExtrudeGeometry(wallShape, {
-            depth: wallThickness,
-            bevelEnabled: false,
-            UVGenerator: {
-                generateTopUV: function (geometry, vertices, indexA, indexB, indexC) {
-                    return [
-                        new THREE.Vector2(0, 0),
-                        new THREE.Vector2(1, 0),
-                        new THREE.Vector2(1, 1)
-                    ];
-                },
-                generateSideWallUV: function (geometry, vertices, indexA, indexB, indexC, indexD) {
-                    return [
-                        new THREE.Vector2(0, 0),
-                        new THREE.Vector2(1, 0),
-                        new THREE.Vector2(1, 1),
-                        new THREE.Vector2(0, 1)
-                    ];
-                }
-            }
-        })
-
-        // Manually fix UVs for proper texture mapping
-        return setFrontFaceUVs(geometry)
-    }
+    // Memoize geometries
+    const wallGeometry = useMemo(() => 
+        new THREE.BoxGeometry(1, 1, 1), 
+        []
+    )
 
     return (
         <group>
-            {/* Back wall - 3D element */}
+            {/* Back wall */}
             <mesh
                 ref={(ref) => ref && (wallRefs.current['back'] = ref)}
                 position={[0, roomHeight / 2, -roomLength / 2]}
+                scale={[roomWidth, roomHeight, wallThickness]}
                 receiveShadow
                 castShadow
                 onDoubleClick={handleWallClick('back')}
+                geometry={wallGeometry}
             >
-                <boxGeometry args={[roomWidth, roomHeight, wallThickness]} />
-                {createWallMaterial('back')}
+                {wallMaterials.back}
             </mesh>
 
-            {/* Left wall - 3D element */}
+            {/* Left wall */}
             <mesh
                 ref={(ref) => ref && (wallRefs.current['left'] = ref)}
                 position={[-roomWidth / 2, roomHeight / 2, 0]}
+                scale={[wallThickness, roomHeight, roomLength]}
                 receiveShadow
                 castShadow
                 onDoubleClick={handleWallClick('left')}
+                geometry={wallGeometry}
             >
-                <boxGeometry args={[wallThickness, roomHeight, roomLength]} />
-                {createWallMaterial('left')}
+                {wallMaterials.left}
             </mesh>
 
-            {/* Right wall - 3D element */}
+            {/* Right wall */}
             <mesh
                 ref={(ref) => ref && (wallRefs.current['right'] = ref)}
                 position={[roomWidth / 2, roomHeight / 2, 0]}
+                scale={[wallThickness, roomHeight, roomLength]}
                 receiveShadow
                 castShadow
                 onDoubleClick={handleWallClick('right')}
+                geometry={wallGeometry}
             >
-                <boxGeometry args={[wallThickness, roomHeight, roomLength]} />
-                {createWallMaterial('right')}
+                {wallMaterials.right}
             </mesh>
 
-            {/* Front wall - 3D element */}
+            {/* Front wall */}
             <mesh
                 ref={(ref) => ref && (wallRefs.current['front'] = ref)}
                 position={[0, roomHeight / 2, roomLength / 2]}
+                scale={[roomWidth, roomHeight, wallThickness]}
                 receiveShadow
                 castShadow
                 onDoubleClick={handleWallClick('front')}
+                geometry={wallGeometry}
             >
-                <boxGeometry args={[roomWidth, roomHeight, wallThickness]} />
-                {createWallMaterial('front')}
+                {wallMaterials.front}
             </mesh>
 
-            {/* Add windows using the reusable Window component */}
+            {/* Windows - reduced complexity */}
             <Window
                 position={[-roomWidth / 2, roomHeight * 0.67, -roomLength / 6]}
                 rotation={[0, Math.PI / 2, 0]}
@@ -268,7 +196,7 @@ export default function Walls() {
                 size={[2, 1.2]}
             />
 
-            {/* 3D Ceiling component */}
+            {/* Ceiling */}
             <Ceiling />
         </group>
     )

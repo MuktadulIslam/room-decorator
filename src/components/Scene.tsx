@@ -2,10 +2,10 @@
 
 import { Canvas } from '@react-three/fiber'
 import { Suspense } from 'react'
+import * as THREE from 'three'
 import Room from './3d/Room'
 import Lighting from './3d/Lighting'
 import CameraController from './3d/CameraController'
-import { OrbitControls } from '@react-three/drei'
 
 export default function Scene() {
     return (
@@ -14,12 +14,27 @@ export default function Scene() {
                 position: [0, 1.6, 3],
                 fov: 75,
                 near: 0.1,
-                far: 1000,
+                far: 100, // Reduced far plane for better performance
             }}
-            shadows
+            shadows={{
+                enabled: true,
+                type: THREE.PCFSoftShadowMap, // Use THREE.js constant instead of string
+            }}
+            gl={{
+                antialias: true,
+                alpha: false,
+                powerPreference: "high-performance",
+                stencil: false,
+                depth: true,
+            }}
+            dpr={[1, 2]} // Limit device pixel ratio for better performance
+            performance={{
+                min: 0.5, // Minimum target framerate
+                max: 1.0, // Maximum target framerate
+                debounce: 200, // Debounce time for performance adjustments
+            }}
             className="bg-gradient-to-b from-blue-200 to-blue-300"
         >
-            {/* <OrbitControls maxZoom={1} minZoom={100} /> */}
             <Suspense fallback={null}>
                 <CameraController />
                 <Lighting />

@@ -1,56 +1,53 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useColors } from '../../contexts/ColorContext'
 
 export default function CeilingLights() {
     const { roomDimensions } = useColors()
     const { width: roomWidth, length: roomLength, height: roomHeight } = roomDimensions
 
-    // Calculate light positions based on room dimensions
-    // Create a 2x3 grid that scales with room size
-    const lightSpacingX = roomWidth / 3 // Divide width into 3 sections
-    const lightSpacingZ = roomLength / 4 // Divide length into 4 sections
+    // Reduce number of lights for better performance
+    const lightPositions = useMemo(() => {
+        const lightSpacingX = roomWidth / 2
+        const lightSpacingZ = roomLength / 3
 
-    const lightPositions = [
-        [-lightSpacingX / 2, roomHeight - 0.2, -lightSpacingZ], // Row 1
-        [lightSpacingX / 2, roomHeight - 0.2, -lightSpacingZ],
-        [-lightSpacingX / 2, roomHeight - 0.2, 0],    // Row 2  
-        [lightSpacingX / 2, roomHeight - 0.2, 0],
-        [-lightSpacingX / 2, roomHeight - 0.2, lightSpacingZ],  // Row 3
-        [lightSpacingX / 2, roomHeight - 0.2, lightSpacingZ],
-    ]
+        return [
+            [-lightSpacingX / 2, roomHeight - 0.2, -lightSpacingZ / 2],
+            [lightSpacingX / 2, roomHeight - 0.2, -lightSpacingZ / 2],
+            [-lightSpacingX / 2, roomHeight - 0.2, lightSpacingZ / 2],
+            [lightSpacingX / 2, roomHeight - 0.2, lightSpacingZ / 2],
+        ]
+    }, [roomWidth, roomLength, roomHeight])
+
+    // Shared geometry for light fixtures
+    const lightGeometry = useMemo(() => (
+        <cylinderGeometry args={[0.15, 0.15, 0.05, 8]} />
+    ), [])
+
+    const lightMaterial = useMemo(() => (
+        <meshLambertMaterial color="#d0d0d0" />
+    ), [])
 
     return (
         <group>
             {lightPositions.map((position, index) => (
                 <group key={index}>
-                    {/* Light fixture housing */}
+                    {/* Light fixture housing - reduced segments for performance */}
                     <mesh position={[position[0], position[1] + 0.1, position[2]]} castShadow>
-                        <cylinderGeometry args={[0.15, 0.15, 0.05, 16]} />
-                        <meshLambertMaterial color="#d0d0d0" />
+                        {lightGeometry}
+                        {lightMaterial}
                     </mesh>
 
-                    {/* Point light */}
+                    {/* Single point light per fixture - no spotlight to reduce complexity */}
                     <pointLight
                         position={[position[0], position[1] - 0.1, position[2]]}
-                        intensity={0.4}
-                        distance={Math.max(roomWidth, roomLength) * 0.8}
+                        intensity={0.6}
+                        distance={Math.max(roomWidth, roomLength) * 0.9}
                         decay={2}
                         color="#ffffff"
-                        castShadow
-                    />
-
-                    {/* Soft spotlight for better coverage */}
-                    <spotLight
-                        position={[position[0], position[1], position[2]]}
-                        target-position={[position[0], 0, position[2]]}
-                        intensity={0.3}
-                        angle={Math.PI / 4}
-                        penumbra={0.5}
-                        distance={roomHeight * 2}
-                        decay={2}
-                        color="#ffffff"
-                        castShadow
+                        castShadow={index < 2} // Only first 2 lights cast shadows
+                        shadow-mapSize={[512, 512]} // Reduce shadow map size
                     />
                 </group>
             ))}
